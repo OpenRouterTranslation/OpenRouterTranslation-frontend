@@ -1,3 +1,4 @@
+import { MovieDetails } from './../components/MovieDetails';
 import { useEffect, useState } from "react";
 import {
   HttpMethod,
@@ -25,25 +26,27 @@ export type Movie = {
 //   }
 export type Translation = {
   id: number;
-  translatedSrtText: string;
-  versionNumber: number;
+  name: string;
 };
 export const useHeader = (
   setSelectedTranslation: React.Dispatch<React.SetStateAction<number>>,
   setSelectedMovie: React.Dispatch<React.SetStateAction<number>>,
-  selectedMovie: number
+  selectedMovie: number,
+  setSelectedAiTranslation: React.Dispatch<React.SetStateAction<number>>
 ) => {
   const [movieOptions, setMovieOptions] = useState<Movie[]>([]);
   // const [selectedMovie, setSelectedMovie] = useState<number>(-1);
 
   const [translations, setTranslations] = useState<Translation[]>([]);
-
+  const [aiTranslations, setAiTranslations] = useState<Translation[]>([]);
+  const [movieDetails, setMovieDetails] = useState<Movie | undefined>(undefined);
   const hangleUploadFile = async (event: any) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
     try {
       const result = await uploadFileToApi(file, selectedMovie);
+      window.location.reload();
       console.log("Upload successful:", result);
     } catch (error) {
       console.error(error);
@@ -68,21 +71,14 @@ export const useHeader = (
     const fetchTranslationOptions = async () => {
       try {
         const responseOriginal = await sendRequest(
-          `/translations/original/${selectedMovie}`,
+          `/subtitles/original/${selectedMovie}`,
           HttpMethod.GET,
           null
         );
-        const responseTranslated = await sendRequest(
-          `/translations/movie/${selectedMovie}`,
-          HttpMethod.GET,
-          null
-        );
+
         const dataOriginal = await responseOriginal.json();
-        const dataTranslated = await responseTranslated.json();
 
-        const data = [...dataOriginal, ...dataTranslated];
-
-        setTranslations(data);
+        setTranslations(dataOriginal);
       } catch (err) {
         console.error(err);
       }
@@ -90,8 +86,33 @@ export const useHeader = (
     fetchTranslationOptions();
   }, [selectedMovie]);
 
-  const onMovieChange = (event: any) => {
+  useEffect(() => {
+    const fetchAiSubtitles = async () => {
+      try {
+        const response = await sendRequest(
+          `/subtitles/ai-translated/${selectedMovie}`,
+          HttpMethod.GET,
+          null
+        );
+        const data = await response.json();
+        setAiTranslations(data);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    fetchAiSubtitles();
+  }, [translations]);
+
+  const onMovieChange = async (event: any) => {
     setSelectedMovie(event.target.value);
+    const response = await sendRequest(
+      `/movies/${event.target.value}`,
+      HttpMethod.GET,
+      null
+    );
+    const data = await response.json();
+    setMovieDetails(data);
   };
 
   const handleTranslationChange = (event: any) => {
@@ -103,8 +124,10 @@ export const useHeader = (
     selectedMovie,
     onMovieChange,
     translations,
+    aiTranslations,
     handleTranslationChange,
     hangleUploadFile,
     movieOptions,
+    movieDetails,
   };
 };

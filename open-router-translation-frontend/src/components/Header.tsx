@@ -6,10 +6,12 @@ import {
   InputLabel,
   MenuItem,
   Select,
+  Typography,
 } from "@mui/material";
 import Grid from "@mui/material/Grid";
 import { useHeader } from "../hooks/useHeader";
 import { Link } from "react-router-dom";
+import { MovieDetails } from "./MovieDetails";
 
 const options = [
   { id: 1, name: "Option 1" },
@@ -32,29 +34,39 @@ interface HeaderProps {
   setSelectedTranslation: React.Dispatch<React.SetStateAction<number>>;
   selectedMovie: number;
   setSelectedMovie: React.Dispatch<React.SetStateAction<number>>;
+  setSelectedAiTranslation: React.Dispatch<React.SetStateAction<number>>;
 }
 
-export const Header: React.FC<HeaderProps> = ({ setSelectedTranslation, selectedMovie, setSelectedMovie }) => {
+export const Header: React.FC<HeaderProps> = ({
+  setSelectedTranslation,
+  selectedMovie,
+  setSelectedMovie,
+  setSelectedAiTranslation,
+}) => {
   const {
     onMovieChange,
     translations,
     handleTranslationChange,
     hangleUploadFile,
     movieOptions,
-  } = useHeader(setSelectedTranslation, setSelectedMovie, selectedMovie);
+    aiTranslations,
+    movieDetails,
+  } = useHeader(
+    setSelectedTranslation,
+    setSelectedMovie,
+    selectedMovie,
+    setSelectedAiTranslation
+  );
 
   return (
     <Box sx={{ flexGrow: 1 }}>
       <Grid container spacing={6} alignItems="center">
-        {/* Create Movie Button */}
         <Grid size={{ xs: 12, md: 3 }}>
-          <Button component={Link} to="/create" variant="contained" fullWidth>
-            Create Movie
-          </Button>
+          {movieDetails ? <MovieDetails movie={movieDetails} /> : <Typography variant="h5">Select a movie</Typography>}
         </Grid>
 
         {/* Movie Select */}
-        <Grid size={{ xs: 12, md: 3 }}>
+        <Grid size={{ xs: 12, md: 2.5 }}>
           <FormControl fullWidth>
             <InputLabel id="movie-select-label">Movie</InputLabel>
             <Select
@@ -72,26 +84,56 @@ export const Header: React.FC<HeaderProps> = ({ setSelectedTranslation, selected
         </Grid>
 
         {/* Translation Select */}
-        <Grid size={{ xs: 12, md: 3 }}>
+        <Grid size={{ xs: 12, md: 2.5 }}>
           <FormControl fullWidth>
-            <InputLabel id="translation-select-label">Translation</InputLabel>
+            <InputLabel id="translation-select-label">
+              Original subtitles
+            </InputLabel>
             <Select
               labelId="translation-select-label"
               id="translation-select"
               disabled={selectedMovie < 0}
               onChange={handleTranslationChange}
             >
-              {translations.map((opt: any) => (
-                <MenuItem key={opt.id} value={opt.id}>
-                  {opt.translatedSrtText}
+              {translations.map((translation) => (
+                <MenuItem key={translation.id} value={translation.id}>
+                  {translation.name}
                 </MenuItem>
               ))}
             </Select>
           </FormControl>
         </Grid>
 
-        {/* Upload Button */}
-        <Grid size={{ xs: 12, md: 3 }}>
+        {/* aiTranslations Select */}
+        <Grid size={{ xs: 12, md: 2.5 }}>
+          <FormControl fullWidth>
+            <InputLabel id="translation-select-label">AI Subtitles</InputLabel>
+            <Select
+              labelId="translation-select-label"
+              id="translation-select"
+              disabled={selectedMovie < 0}
+              onChange={handleTranslationChange}
+            >
+              {aiTranslations.map((translation) => (
+                <MenuItem key={translation.id} value={translation.id}>
+                  {translation.name}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        </Grid>
+        <Grid
+          size={{ xs: 12, md: 1.5 }}
+          display={"flex"}
+          justifyContent={"center"}
+          flexDirection={"column"}
+          gap={2}
+        >
+          {/* Create Movie Button */}
+          <Button component={Link} to="/create" variant="contained" fullWidth>
+            Create Movie
+          </Button>
+          {/* Upload Button */}
           <Button component="label" variant="contained" fullWidth>
             Upload Files
             <VisuallyHiddenInput

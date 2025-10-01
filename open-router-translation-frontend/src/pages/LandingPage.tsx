@@ -8,8 +8,10 @@ import type { Subtitle } from "../components/Middle";
 import { translateChunks } from "../services/baseService";
 
 export const LandingPage = () => {
+    const [selectedMovieId, setSelectedMovieId] = useState<number>(-1);
     const [selectedTranslationId, setSelectedTranslation] = useState<number>(-1);
-    const [selectedMovie, setSelectedMovie] = useState<number>(-1);
+    const [selectedAiTranslationId, setSelectedAiTranslation] = useState<number>(-1);
+
     const [language, setLanguage] = useState<string>("en");
     const [selectedModel, setSelectedModel] = useState<Model | null>(null);
     const [currentSubtitles, setCurrentSubtitles] = useState<Subtitle[]>([]);
@@ -116,12 +118,13 @@ export const LandingPage = () => {
         <Paper elevation={3} sx={{ p: 6, borderRadius: 3 }}>
             <Header
                 setSelectedTranslation={setSelectedTranslation}
-                selectedMovie={selectedMovie}
-                setSelectedMovie={setSelectedMovie}
+                selectedMovie={selectedMovieId}
+                setSelectedMovie={setSelectedMovieId}
+                setSelectedAiTranslation={setSelectedAiTranslation}
             />
             <Middle
                 selectedTranslationId={selectedTranslationId}
-                selectedMovie={selectedMovie}
+                selectedMovie={selectedMovieId}
                 onSubtitlesChange={handleSubtitlesChange}
                 updatedSubtitles={currentSubtitles}
                 isTranslating={isTranslating}
