@@ -1,12 +1,16 @@
+import { apiKeyStorage } from "./apiKeyStorage";
+
 const baseUrl = "http://localhost:8080";
+
 export enum HttpMethod {
   GET = "GET",
   POST = "POST",
 }
+
 export const sendRequest = async (
-  path: string,
-  method: HttpMethod,
-  data: any
+    path: string,
+    method: HttpMethod,
+    data: any
 ) => {
   return fetch(baseUrl + path, {
     method: method,
@@ -18,18 +22,26 @@ export const sendRequest = async (
 };
 
 export const translateChunks = async (
-    originalId: number, // Add this parameter
+    originalId: number,
     chunks: any[],
     model: string,
     language: string,
     batchSize: number = 10
 ) => {
+  // Get the API key from secure storage
+  const apiKey = await apiKeyStorage.getApiKey();
+
+  if (!apiKey) {
+    throw new Error('No API key found. Please set your OpenRouter API key in settings.');
+  }
+
   const requestBody = {
-    originalId: originalId, // Add this field
+    originalId: originalId,
     chunks: chunks,
     model: model,
     language: language,
-    batchSize: batchSize
+    batchSize: batchSize,
+    apiKey: apiKey  // Include the API key in the request
   };
 
   return sendRequest("/api/openrouter/translate/chunks", HttpMethod.POST, requestBody);
@@ -37,7 +49,7 @@ export const translateChunks = async (
 
 export async function uploadFileToApi(file: File, movieId: number) {
   const formData = new FormData();
-  formData.append("file", file); // match the key with your API
+  formData.append("file", file);
 
   try {
     const response = await fetch(baseUrl + "/subtitles/upload/" + movieId, {

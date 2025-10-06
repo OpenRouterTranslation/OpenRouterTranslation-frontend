@@ -1,4 +1,4 @@
-import { Box, CircularProgress, Typography } from "@mui/material";
+import { Box, Button, CircularProgress, TextField, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 import { HttpMethod, sendRequest } from "../services/baseService";
 import SelectableTextRows from "./SelectableTextRows";
@@ -17,37 +17,62 @@ export type Subtitle = {
 };
 
 interface Props {
-    selectedTranslationId: number;
-    selectedMovie: number;
+    selectedOriginalId: number;
+    selectedAiTranslationId: number;
     onSubtitlesChange: (subtitles: Subtitle[]) => void;
     updatedSubtitles?: Subtitle[];
-    isTranslating?: boolean; // Add loading prop
+    isTranslating?: boolean;
+    hasUnsavedTranslation?: boolean;
+    onSaveTranslation?: () => void;
+    currentLanguage?: string;
+    onSelectRow?: (index: number) => void;
+    selectedRowIndex?: number;
 }
 
 export const Middle: React.FC<Props> = ({
-                                            selectedTranslationId,
-                                            selectedMovie,
+                                            selectedOriginalId,
+                                            selectedAiTranslationId,
                                             onSubtitlesChange,
                                             updatedSubtitles,
-                                            isTranslating = false, // Add loading prop
+                                            isTranslating = false,
+                                            hasUnsavedTranslation = false,
+                                            onSaveTranslation,
+                                            currentLanguage = "unknown",
                                         }) => {
     const [subtitles, setSubtitles] = useState<Subtitle[]>([]);
+    const [translationName, setTranslationName] = useState<string>("");
+    const [isSaving, setIsSaving] = useState<boolean>(false);
 
     useEffect(() => {
         const fetchSubtitles = async () => {
-            if (selectedMovie === -1) return;
+            if (selectedOriginalId === -1) {
+                setSubtitles([]);
+                onSubtitlesChange([]);
+                return;
+            }
+
+            let queryParams = `?originalId=${selectedOriginalId}`;
+            if (selectedAiTranslationId !== -1) {
+                queryParams += `&translatedId=${selectedAiTranslationId}`;
+            }
 
             const response = await sendRequest(
-                `/subtitles/${selectedMovie}`,
+                `/subtitles-display${queryParams}`,
                 HttpMethod.GET,
                 null
             );
             const data = await response.json();
-            setSubtitles(data);
-            onSubtitlesChange(data);
+
+            const wrappedData = [{
+                id: selectedOriginalId,
+                chunks: data
+            }];
+
+            setSubtitles(wrappedData);
+            onSubtitlesChange(wrappedData);
         };
         fetchSubtitles();
-    }, [selectedMovie]);
+    }, [selectedOriginalId, selectedAiTranslationId]);
 
     useEffect(() => {
         if (updatedSubtitles && updatedSubtitles.length > 0) {
@@ -55,9 +80,93 @@ export const Middle: React.FC<Props> = ({
         }
     }, [updatedSubtitles]);
 
+    const handleSaveTranslation = async () => {
+        if (!translationName.trim()) {
+            alert("Please enter a name for the translation");
+            return;
+        }
+
+        if (subtitles.length === 0 || !subtitles[0].chunks) {
+            alert("No translation data to save");
+            return;
+        }
+
+        setIsSaving(true);
+
+        try {
+            const requestBody = {
+                originalId: selectedOriginalId,
+                name: translationName,
+                subtitleChunks: subtitles[0].chunks,
+                language: currentLanguage,
+            };
+
+            console.log("Sending save request with body:", requestBody);
+
+            const response = await sendRequest(
+                "/subtitles/save/translated",
+                HttpMethod.POST,
+                requestBody
+            );
+
+            if (response.ok) {
+                const savedTranslation = await response.json();
+                alert("Translation saved successfully!");
+                setTranslationName("");
+                if (onSaveTranslation) {
+                    onSaveTranslation();
+                }
+            } else {
+                const errorText = await response.text();
+                console.error("Failed to save translation:", errorText);
+                alert("Failed to save translation");
+            }
+        } catch (error) {
+            console.error("Error saving translation:", error);
+            alert("Error saving translation");
+        } finally {
+            setIsSaving(false);
+        }
+    };
+
     return (
         <Box sx={{ my: 5, position: 'relative' }}>
             <SelectableTextRows subtitles={subtitles} />
+
+            {/* Save Translation Section */}
+            {hasUnsavedTranslation && (
+                <Box sx={{
+                    mt: 3,
+                    p: 2,
+                    border: 1,
+                    borderColor: 'divider',
+                    borderRadius: 1,
+                    bgcolor: 'background.paper'
+                }}>
+                    <Typography variant="h6" sx={{ mb: 2 }}>
+                        Save Translation
+                    </Typography>
+                    <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
+                        <TextField
+                            label="Translation Name"
+                            value={translationName}
+                            onChange={(e) => setTranslationName(e.target.value)}
+                            placeholder={`${currentLanguage} - Version 1`}
+                            fullWidth
+                            disabled={isSaving}
+                        />
+                        <Button
+                            variant="contained"
+                            color="success"
+                            onClick={handleSaveTranslation}
+                            disabled={isSaving || !translationName.trim()}
+                            sx={{ minWidth: 120 }}
+                        >
+                            {isSaving ? <CircularProgress size={24} /> : "Save"}
+                        </Button>
+                    </Box>
+                </Box>
+            )}
 
             {/* Loading Overlay */}
             {isTranslating && (
