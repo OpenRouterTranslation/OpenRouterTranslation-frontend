@@ -1,9 +1,17 @@
+<<<<<<< HEAD
+=======
+// Secure client-side API key storage using Web Crypto API and IndexedDB
+>>>>>>> 6ce1fe9452ef126bfb3ef1e6e56699f20f7836ad
 
 const DB_NAME = 'SubtitleTranslatorDB';
 const STORE_NAME = 'apiKeys';
 const KEY_ID = 'openrouter_key';
 const SALT_ID = 'encryption_salt';
 
+<<<<<<< HEAD
+=======
+// Initialize IndexedDB
+>>>>>>> 6ce1fe9452ef126bfb3ef1e6e56699f20f7836ad
 const initDB = (): Promise<IDBDatabase> => {
     return new Promise((resolve, reject) => {
         const request = indexedDB.open(DB_NAME, 1);
@@ -20,6 +28,10 @@ const initDB = (): Promise<IDBDatabase> => {
     });
 };
 
+<<<<<<< HEAD
+=======
+// Get or create a salt for key derivation
+>>>>>>> 6ce1fe9452ef126bfb3ef1e6e56699f20f7836ad
 const getSalt = async (db: IDBDatabase): Promise<Uint8Array> => {
     return new Promise((resolve, reject) => {
         const transaction = db.transaction(STORE_NAME, 'readonly');
@@ -43,7 +55,13 @@ const getSalt = async (db: IDBDatabase): Promise<Uint8Array> => {
     });
 };
 
+<<<<<<< HEAD
 const deriveKey = async (salt: Uint8Array): Promise<CryptoKey> => {
+=======
+// Derive encryption key from passphrase (browser fingerprint)
+const deriveKey = async (salt: Uint8Array): Promise<CryptoKey> => {
+    // Create a semi-unique identifier from browser characteristics
+>>>>>>> 6ce1fe9452ef126bfb3ef1e6e56699f20f7836ad
     const fingerprint = [
         navigator.userAgent,
         navigator.language,
@@ -76,7 +94,11 @@ const deriveKey = async (salt: Uint8Array): Promise<CryptoKey> => {
     );
 };
 
+<<<<<<< HEAD
 
+=======
+// Encrypt API key
+>>>>>>> 6ce1fe9452ef126bfb3ef1e6e56699f20f7836ad
 const encryptKey = async (apiKey: string): Promise<{ encrypted: ArrayBuffer; iv: Uint8Array }> => {
     const db = await initDB();
     const salt = await getSalt(db);
@@ -94,6 +116,10 @@ const encryptKey = async (apiKey: string): Promise<{ encrypted: ArrayBuffer; iv:
     return { encrypted, iv };
 };
 
+<<<<<<< HEAD
+=======
+// Decrypt API key
+>>>>>>> 6ce1fe9452ef126bfb3ef1e6e56699f20f7836ad
 const decryptKey = async (encrypted: ArrayBuffer, iv: Uint8Array): Promise<string> => {
     const db = await initDB();
     const salt = await getSalt(db);
@@ -110,7 +136,13 @@ const decryptKey = async (encrypted: ArrayBuffer, iv: Uint8Array): Promise<strin
     return decoder.decode(decrypted);
 };
 
+<<<<<<< HEAD
 export const apiKeyStorage = {
+=======
+// Public API
+export const apiKeyStorage = {
+    // Save API key
+>>>>>>> 6ce1fe9452ef126bfb3ef1e6e56699f20f7836ad
     async saveApiKey(apiKey: string): Promise<void> {
         try {
             const { encrypted, iv } = await encryptKey(apiKey);
@@ -119,6 +151,10 @@ export const apiKeyStorage = {
             const transaction = db.transaction(STORE_NAME, 'readwrite');
             const store = transaction.objectStore(STORE_NAME);
 
+<<<<<<< HEAD
+=======
+            // Store both encrypted data and IV
+>>>>>>> 6ce1fe9452ef126bfb3ef1e6e56699f20f7836ad
             store.put({ encrypted, iv }, KEY_ID);
 
             return new Promise((resolve, reject) => {
@@ -137,7 +173,11 @@ export const apiKeyStorage = {
         }
     },
 
+<<<<<<< HEAD
 
+=======
+    // Get decrypted API key
+>>>>>>> 6ce1fe9452ef126bfb3ef1e6e56699f20f7836ad
     async getApiKey(): Promise<string | null> {
         try {
             const db = await initDB();
@@ -172,6 +212,10 @@ export const apiKeyStorage = {
         }
     },
 
+<<<<<<< HEAD
+=======
+    // Check if API key exists
+>>>>>>> 6ce1fe9452ef126bfb3ef1e6e56699f20f7836ad
     async hasApiKey(): Promise<boolean> {
         try {
             const db = await initDB();
@@ -195,6 +239,10 @@ export const apiKeyStorage = {
         }
     },
 
+<<<<<<< HEAD
+=======
+    // Delete API key
+>>>>>>> 6ce1fe9452ef126bfb3ef1e6e56699f20f7836ad
     async deleteApiKey(): Promise<void> {
         try {
             const db = await initDB();

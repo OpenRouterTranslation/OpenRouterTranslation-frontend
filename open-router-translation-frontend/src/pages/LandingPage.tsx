@@ -24,10 +24,17 @@ export const LandingPage = () => {
     const [translationsRefreshTrigger, setTranslationsRefreshTrigger] = useState<number>(0);
     const [selectedRowIndex, setSelectedRowIndex] = useState<number>(-1);
 
+<<<<<<< HEAD
     const currentSubtitles = hasUnsavedTranslation && newTranslation.length > 0 ? newTranslation : fetchedSubtitles;
     const hasTranslation = currentSubtitles.length > 0 && currentSubtitles[0].chunks.some(c => c.translatedText);
     
 
+=======
+    // Check if there's any translation (either fetched or newly created)
+    const currentSubtitles = hasUnsavedTranslation && newTranslation.length > 0 ? newTranslation : fetchedSubtitles;
+    const hasTranslation = currentSubtitles.length > 0 && currentSubtitles[0].chunks.some(c => c.translatedText);
+
+>>>>>>> 6ce1fe9452ef126bfb3ef1e6e56699f20f7836ad
     const handleClickRetranslate = async (beforeCount: number, afterCount: number) => {
         if (!selectedModel || !selectedModel.modelId) {
             alert("Please select a model first");
@@ -44,6 +51,10 @@ export const LandingPage = () => {
             return;
         }
 
+<<<<<<< HEAD
+=======
+        // Use the current displayed subtitles (either new translation or fetched)
+>>>>>>> 6ce1fe9452ef126bfb3ef1e6e56699f20f7836ad
         const currentSubs = hasUnsavedTranslation && newTranslation.length > 0 ? newTranslation : fetchedSubtitles;
 
         if (currentSubs.length === 0 || !currentSubs[0].chunks) {
@@ -74,6 +85,10 @@ export const LandingPage = () => {
                 const translatedChunks = await response.json();
                 console.log("Retranslation successful", translatedChunks);
 
+<<<<<<< HEAD
+=======
+                // Replace the translated chunks in the current subtitles
+>>>>>>> 6ce1fe9452ef126bfb3ef1e6e56699f20f7836ad
                 const updatedChunks = [...allChunks];
                 translatedChunks.forEach((chunk: any, idx: number) => {
                     const originalIndex = startIndex + idx;
@@ -177,17 +192,29 @@ export const LandingPage = () => {
         setFetchedSubtitles(subtitles);
         setNewTranslation([]);
         setHasUnsavedTranslation(false);
+<<<<<<< HEAD
         setSelectedRowIndex(-1);
     };
 
     const handleSelectRow = (index: number) => {
         console.log("Row selected in LandingPage:", index);
+=======
+        setSelectedRowIndex(-1); // Reset row selection when subtitles change
+    };
+
+    const handleSelectRow = (index: number) => {
+        console.log("Row selected:", index);
+>>>>>>> 6ce1fe9452ef126bfb3ef1e6e56699f20f7836ad
         setSelectedRowIndex(index);
     };
 
     const handleSaveTranslation = () => {
         setHasUnsavedTranslation(false);
         setNewTranslation([]);
+<<<<<<< HEAD
+=======
+        setMiddleRefreshKey(prev => prev + 1);
+>>>>>>> 6ce1fe9452ef126bfb3ef1e6e56699f20f7836ad
         setTranslationsRefreshTrigger(prev => prev + 1);
     };
 
@@ -198,6 +225,10 @@ export const LandingPage = () => {
         setSelectedMovieId(-1);
         setSelectedOriginalId(-1);
         setSelectedAiTranslation(-1);
+<<<<<<< HEAD
+=======
+        setMiddleRefreshKey(prev => prev + 1);
+>>>>>>> 6ce1fe9452ef126bfb3ef1e6e56699f20f7836ad
     };
 
     const handleOriginalDeleted = () => {
@@ -206,6 +237,10 @@ export const LandingPage = () => {
         setHasUnsavedTranslation(false);
         setSelectedOriginalId(-1);
         setSelectedAiTranslation(-1);
+<<<<<<< HEAD
+=======
+        setMiddleRefreshKey(prev => prev + 1);
+>>>>>>> 6ce1fe9452ef126bfb3ef1e6e56699f20f7836ad
     };
 
     const handleTranslationDeleted = () => {
@@ -213,6 +248,10 @@ export const LandingPage = () => {
         setNewTranslation([]);
         setHasUnsavedTranslation(false);
         setSelectedAiTranslation(-1);
+<<<<<<< HEAD
+=======
+        setMiddleRefreshKey(prev => prev + 1);
+>>>>>>> 6ce1fe9452ef126bfb3ef1e6e56699f20f7836ad
     };
 
     const displaySubtitles = hasUnsavedTranslation && newTranslation.length > 0

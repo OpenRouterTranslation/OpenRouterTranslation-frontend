@@ -38,8 +38,11 @@ export const Middle: React.FC<Props> = ({
                                             hasUnsavedTranslation = false,
                                             onSaveTranslation,
                                             currentLanguage = "unknown",
+<<<<<<< HEAD
                                             onSelectRow,
                                             selectedRowIndex,
+=======
+>>>>>>> 6ce1fe9452ef126bfb3ef1e6e56699f20f7836ad
                                         }) => {
     const [subtitles, setSubtitles] = useState<Subtitle[]>([]);
     const [translationName, setTranslationName] = useState<string>("");
@@ -138,6 +141,41 @@ export const Middle: React.FC<Props> = ({
                 onSelectRow={onSelectRow}
                 selectedRowIndex={selectedRowIndex}
             />
+
+            {/* Save Translation Section */}
+            {hasUnsavedTranslation && (
+                <Box sx={{
+                    mt: 3,
+                    p: 2,
+                    border: 1,
+                    borderColor: 'divider',
+                    borderRadius: 1,
+                    bgcolor: 'background.paper'
+                }}>
+                    <Typography variant="h6" sx={{ mb: 2 }}>
+                        Save Translation
+                    </Typography>
+                    <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
+                        <TextField
+                            label="Translation Name"
+                            value={translationName}
+                            onChange={(e) => setTranslationName(e.target.value)}
+                            placeholder={`${currentLanguage} - Version 1`}
+                            fullWidth
+                            disabled={isSaving}
+                        />
+                        <Button
+                            variant="contained"
+                            color="success"
+                            onClick={handleSaveTranslation}
+                            disabled={isSaving || !translationName.trim()}
+                            sx={{ minWidth: 120 }}
+                        >
+                            {isSaving ? <CircularProgress size={24} /> : "Save"}
+                        </Button>
+                    </Box>
+                </Box>
+            )}
 
             {/* Save Translation Section */}
             {hasUnsavedTranslation && (

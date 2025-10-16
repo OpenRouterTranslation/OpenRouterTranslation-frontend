@@ -2,6 +2,13 @@ import {
     Grid,
     Box,
     Switch,
+<<<<<<< HEAD
+=======
+    Select,
+    MenuItem,
+    FormControl,
+    InputLabel,
+>>>>>>> 6ce1fe9452ef126bfb3ef1e6e56699f20f7836ad
     Typography,
     Button,
     CircularProgress,
@@ -102,12 +109,17 @@ export const Footer: React.FC<Props> = ({
                                             handleClickRetranslate,
                                             isTranslating = false,
                                             hasTranslation = false,
+<<<<<<< HEAD
                                             selectedRowIndex,
+=======
+                                            selectedRowIndex = -1,
+>>>>>>> 6ce1fe9452ef126bfb3ef1e6e56699f20f7836ad
                                         }) => {
     const { checked, setChecked, models } = useFooter();
     const [beforeCount, setBeforeCount] = useState<number>(2);
     const [afterCount, setAfterCount] = useState<number>(2);
 
+<<<<<<< HEAD
     const canRetranslate = hasTranslation &&
         selectedRowIndex !== undefined &&
         selectedRowIndex !== -1 &&
@@ -165,6 +177,52 @@ export const Footer: React.FC<Props> = ({
                         )}
                     />
 
+=======
+    const canRetranslate = hasTranslation && selectedRowIndex !== -1 && beforeCount >= 0 && afterCount >= 0;
+
+    console.log("Footer retranslate state:", { hasTranslation, selectedRowIndex, beforeCount, afterCount, canRetranslate });
+
+    return (
+        <Grid container spacing={2} alignItems="center">
+            {/* First Row */}
+            <Grid size={{ xs: 12 }}>
+                <Box display="flex" alignItems="center" justifyContent="space-between" gap={3}>
+                    <Box display="flex" gap={2} alignItems="center">
+                        <Typography variant="body1" sx={{ opacity: isTranslating ? 0.5 : 1 }}>
+                            Only Free Models
+                        </Typography>
+                        <Switch
+                            name="free-models"
+                            checked={checked}
+                            onChange={(e) => setChecked(e.target.checked)}
+                            disabled={isTranslating}
+                        />
+                    </Box>
+
+                    <FormControl sx={{ flexGrow: 4, opacity: isTranslating ? 0.5 : 1 }} disabled={isTranslating}>
+                        <InputLabel id="select-models-label">Select Model</InputLabel>
+                        <Select
+                            labelId="select-models-label"
+                            id="select-models"
+                            value={selectedModel?.modelId || ""}
+                            onChange={(e) => {
+                                const selected = models.find((m) => m.modelId === e.target.value);
+                                if (selected) setSelectedModel(selected);
+                            }}
+                            disabled={isTranslating}
+                        >
+                            <MenuItem value="" disabled>
+                                Select Model
+                            </MenuItem>
+                            {models.map((model) => (
+                                <MenuItem key={model.modelId} value={model.modelId}>
+                                    {model.modelId}
+                                </MenuItem>
+                            ))}
+                        </Select>
+                    </FormControl>
+
+>>>>>>> 6ce1fe9452ef126bfb3ef1e6e56699f20f7836ad
                     <Autocomplete
                         sx={{ flexGrow: 2, opacity: isTranslating ? 0.5 : 1 }}
                         options={LANGUAGES}
@@ -203,6 +261,10 @@ export const Footer: React.FC<Props> = ({
                 </Box>
             </Grid>
 
+<<<<<<< HEAD
+=======
+            {/* Second Row - Retranslate Section (only shown when translation exists) */}
+>>>>>>> 6ce1fe9452ef126bfb3ef1e6e56699f20f7836ad
             {hasTranslation && (
                 <Grid size={{ xs: 12 }}>
                     <Box display="flex" alignItems="center" gap={2} sx={{
@@ -241,7 +303,11 @@ export const Footer: React.FC<Props> = ({
                         <Typography variant="body2" color="text.secondary" sx={{ flexGrow: 1 }}>
                             {selectedRowIndex === -1
                                 ? "Select a row to retranslate"
+<<<<<<< HEAD
                                 : `Retranslate row ${selectedRowIndex + 1} with ${beforeCount} before and ${afterCount} after`}
+=======
+                                : `Will retranslate row ${selectedRowIndex + 1} with ${beforeCount} before and ${afterCount} after`}
+>>>>>>> 6ce1fe9452ef126bfb3ef1e6e56699f20f7836ad
                         </Typography>
 
                         <Button
@@ -265,4 +331,8 @@ export const Footer: React.FC<Props> = ({
             )}
         </Grid>
     );
+<<<<<<< HEAD
 };
+=======
+};
+>>>>>>> 6ce1fe9452ef126bfb3ef1e6e56699f20f7836ad
