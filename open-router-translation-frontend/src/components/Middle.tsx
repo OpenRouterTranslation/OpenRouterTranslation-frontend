@@ -38,6 +38,8 @@ export const Middle: React.FC<Props> = ({
                                             hasUnsavedTranslation = false,
                                             onSaveTranslation,
                                             currentLanguage = "unknown",
+                                            onSelectRow,
+                                            selectedRowIndex,
                                         }) => {
     const [subtitles, setSubtitles] = useState<Subtitle[]>([]);
     const [translationName, setTranslationName] = useState<string>("");
@@ -131,7 +133,11 @@ export const Middle: React.FC<Props> = ({
 
     return (
         <Box sx={{ my: 5, position: 'relative' }}>
-            <SelectableTextRows subtitles={subtitles} />
+            <SelectableTextRows
+                subtitles={subtitles}
+                onSelectRow={onSelectRow}
+                selectedRowIndex={selectedRowIndex}
+            />
 
             {/* Save Translation Section */}
             {hasUnsavedTranslation && (

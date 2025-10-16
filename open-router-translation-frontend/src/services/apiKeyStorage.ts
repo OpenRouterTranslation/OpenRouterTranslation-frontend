@@ -1,11 +1,9 @@
-// Secure client-side API key storage using Web Crypto API and IndexedDB
 
 const DB_NAME = 'SubtitleTranslatorDB';
 const STORE_NAME = 'apiKeys';
 const KEY_ID = 'openrouter_key';
 const SALT_ID = 'encryption_salt';
 
-// Initialize IndexedDB
 const initDB = (): Promise<IDBDatabase> => {
     return new Promise((resolve, reject) => {
         const request = indexedDB.open(DB_NAME, 1);
@@ -22,7 +20,6 @@ const initDB = (): Promise<IDBDatabase> => {
     });
 };
 
-// Get or create a salt for key derivation
 const getSalt = async (db: IDBDatabase): Promise<Uint8Array> => {
     return new Promise((resolve, reject) => {
         const transaction = db.transaction(STORE_NAME, 'readonly');
@@ -46,9 +43,7 @@ const getSalt = async (db: IDBDatabase): Promise<Uint8Array> => {
     });
 };
 
-// Derive encryption key from passphrase (browser fingerprint)
 const deriveKey = async (salt: Uint8Array): Promise<CryptoKey> => {
-    // Create a semi-unique identifier from browser characteristics
     const fingerprint = [
         navigator.userAgent,
         navigator.language,
@@ -81,7 +76,7 @@ const deriveKey = async (salt: Uint8Array): Promise<CryptoKey> => {
     );
 };
 
-// Encrypt API key
+
 const encryptKey = async (apiKey: string): Promise<{ encrypted: ArrayBuffer; iv: Uint8Array }> => {
     const db = await initDB();
     const salt = await getSalt(db);
@@ -99,7 +94,6 @@ const encryptKey = async (apiKey: string): Promise<{ encrypted: ArrayBuffer; iv:
     return { encrypted, iv };
 };
 
-// Decrypt API key
 const decryptKey = async (encrypted: ArrayBuffer, iv: Uint8Array): Promise<string> => {
     const db = await initDB();
     const salt = await getSalt(db);
@@ -116,9 +110,7 @@ const decryptKey = async (encrypted: ArrayBuffer, iv: Uint8Array): Promise<strin
     return decoder.decode(decrypted);
 };
 
-// Public API
 export const apiKeyStorage = {
-    // Save API key
     async saveApiKey(apiKey: string): Promise<void> {
         try {
             const { encrypted, iv } = await encryptKey(apiKey);
@@ -127,7 +119,6 @@ export const apiKeyStorage = {
             const transaction = db.transaction(STORE_NAME, 'readwrite');
             const store = transaction.objectStore(STORE_NAME);
 
-            // Store both encrypted data and IV
             store.put({ encrypted, iv }, KEY_ID);
 
             return new Promise((resolve, reject) => {
@@ -146,7 +137,7 @@ export const apiKeyStorage = {
         }
     },
 
-    // Get decrypted API key
+
     async getApiKey(): Promise<string | null> {
         try {
             const db = await initDB();
@@ -181,7 +172,6 @@ export const apiKeyStorage = {
         }
     },
 
-    // Check if API key exists
     async hasApiKey(): Promise<boolean> {
         try {
             const db = await initDB();
@@ -205,7 +195,6 @@ export const apiKeyStorage = {
         }
     },
 
-    // Delete API key
     async deleteApiKey(): Promise<void> {
         try {
             const db = await initDB();
