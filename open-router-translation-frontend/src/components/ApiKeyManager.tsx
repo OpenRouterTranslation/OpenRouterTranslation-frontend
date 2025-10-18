@@ -42,7 +42,6 @@ export default function ApiKeyManager() {
             return;
         }
 
-        // Basic validation for OpenRouter API key format
         if (!apiKey.startsWith('sk-or-')) {
             setError('Invalid API key format. OpenRouter keys start with "sk-or-"');
             return;
@@ -53,7 +52,10 @@ export default function ApiKeyManager() {
 
         try {
             await apiKeyStorage.saveApiKey(apiKey.trim());
-            setHasKey(true);
+
+            await new Promise(resolve => setTimeout(resolve, 100));
+            await checkApiKeyStatus();
+
             setApiKey('');
             setOpen(false);
             alert('API key saved successfully and encrypted in your browser!');
@@ -118,16 +120,6 @@ export default function ApiKeyManager() {
                 </DialogTitle>
                 <DialogContent>
                     <Box sx={{ mt: 2 }}>
-                        <Alert severity="warning" sx={{ mb: 2 }}>
-                            <strong>Development Mode:</strong> This application uses HTTP.
-                            Your API key is encrypted in your browser but travels unencrypted over the network.
-                            Only use in trusted local networks. Production deployment requires HTTPS.
-                        </Alert>
-
-                        <Alert severity="info" sx={{ mb: 2 }}>
-                            Your API key is encrypted and stored securely in your browser using Web Crypto API.
-                            It never leaves your device except when making translation requests.
-                        </Alert>
 
                         {error && (
                             <Alert severity="error" sx={{ mb: 2 }}>
@@ -138,10 +130,10 @@ export default function ApiKeyManager() {
                         {hasKey ? (
                             <Box>
                                 <Alert severity="success" sx={{ mb: 2 }}>
-                                    API key is currently set and active.
+                                    API key is active.
                                 </Alert>
                                 <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                                    You can update your key by entering a new one below, or delete it using the delete button above.
+                                    Update your key:
                                 </Typography>
                             </Box>
                         ) : (

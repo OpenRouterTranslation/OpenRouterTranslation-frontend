@@ -2,7 +2,7 @@ import { Paper } from "@mui/material";
 import { Footer } from "../components/Footer";
 import { Header } from "../components/Header";
 import { Middle } from "../components/Middle";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import type { Model } from "../hooks/useFooter";
 import type { Subtitle } from "../components/Middle";
 import { translateChunks } from "../services/baseService";
@@ -24,9 +24,12 @@ export const LandingPage = () => {
     const [translationsRefreshTrigger, setTranslationsRefreshTrigger] = useState<number>(0);
     const [selectedRowIndex, setSelectedRowIndex] = useState<number>(-1);
 
-    // Check if there's any translation (either fetched or newly created)
     const currentSubtitles = hasUnsavedTranslation && newTranslation.length > 0 ? newTranslation : fetchedSubtitles;
     const hasTranslation = currentSubtitles.length > 0 && currentSubtitles[0].chunks.some(c => c.translatedText);
+
+    useEffect(() => {
+        console.log('LandingPage selectedRowIndex changed to:', selectedRowIndex);
+    }, [selectedRowIndex]);
 
     const handleClickRetranslate = async (beforeCount: number, afterCount: number) => {
         if (!selectedModel || !selectedModel.modelId) {
@@ -44,7 +47,6 @@ export const LandingPage = () => {
             return;
         }
 
-        // Use the current displayed subtitles (either new translation or fetched)
         const currentSubs = hasUnsavedTranslation && newTranslation.length > 0 ? newTranslation : fetchedSubtitles;
 
         if (currentSubs.length === 0 || !currentSubs[0].chunks) {
@@ -75,7 +77,6 @@ export const LandingPage = () => {
                 const translatedChunks = await response.json();
                 console.log("Retranslation successful", translatedChunks);
 
-                // Replace the translated chunks in the current subtitles
                 const updatedChunks = [...allChunks];
                 translatedChunks.forEach((chunk: any, idx: number) => {
                     const originalIndex = startIndex + idx;
@@ -179,18 +180,17 @@ export const LandingPage = () => {
         setFetchedSubtitles(subtitles);
         setNewTranslation([]);
         setHasUnsavedTranslation(false);
-        setSelectedRowIndex(-1); // Reset row selection when subtitles change
+        setSelectedRowIndex(-1);
     };
 
     const handleSelectRow = (index: number) => {
-        console.log("Row selected:", index);
+        console.log("Row selected in LandingPage:", index);
         setSelectedRowIndex(index);
     };
 
     const handleSaveTranslation = () => {
         setHasUnsavedTranslation(false);
         setNewTranslation([]);
-        setMiddleRefreshKey(prev => prev + 1);
         setTranslationsRefreshTrigger(prev => prev + 1);
     };
 
@@ -201,7 +201,6 @@ export const LandingPage = () => {
         setSelectedMovieId(-1);
         setSelectedOriginalId(-1);
         setSelectedAiTranslation(-1);
-        setMiddleRefreshKey(prev => prev + 1);
     };
 
     const handleOriginalDeleted = () => {
@@ -210,7 +209,6 @@ export const LandingPage = () => {
         setHasUnsavedTranslation(false);
         setSelectedOriginalId(-1);
         setSelectedAiTranslation(-1);
-        setMiddleRefreshKey(prev => prev + 1);
     };
 
     const handleTranslationDeleted = () => {
@@ -218,7 +216,6 @@ export const LandingPage = () => {
         setNewTranslation([]);
         setHasUnsavedTranslation(false);
         setSelectedAiTranslation(-1);
-        setMiddleRefreshKey(prev => prev + 1);
     };
 
     const displaySubtitles = hasUnsavedTranslation && newTranslation.length > 0

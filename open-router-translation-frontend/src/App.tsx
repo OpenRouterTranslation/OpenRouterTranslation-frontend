@@ -1,8 +1,8 @@
-import { ThemeProvider, CssBaseline } from '@mui/material';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { LandingPage } from './pages/LandingPage';
-import { MovieForm } from './pages/MovieFormPage';
-import { darkTheme } from './theme.ts';
+import {BrowserRouter, Routes, Route} from "react-router-dom";
+import {LandingPage} from "./pages/LandingPage";
+import {MovieForm} from "./pages/MovieFormPage";
+import {ThemeProvider} from "@mui/material";
+import {darkTheme} from "./theme.ts";
 
 function App() {
     return (

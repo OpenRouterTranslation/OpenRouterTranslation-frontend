@@ -27,8 +27,8 @@ export const translateChunks = async (
     model: string,
     language: string,
     batchSize: number = 10
+
 ) => {
-  // Get the API key from secure storage
   const apiKey = await apiKeyStorage.getApiKey();
 
   if (!apiKey) {

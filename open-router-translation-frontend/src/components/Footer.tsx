@@ -2,10 +2,6 @@ import {
     Grid,
     Box,
     Switch,
-    Select,
-    MenuItem,
-    FormControl,
-    InputLabel,
     Typography,
     Button,
     CircularProgress,
@@ -106,19 +102,19 @@ export const Footer: React.FC<Props> = ({
                                             handleClickRetranslate,
                                             isTranslating = false,
                                             hasTranslation = false,
-                                            selectedRowIndex = -1,
+                                            selectedRowIndex,
                                         }) => {
     const { checked, setChecked, models } = useFooter();
     const [beforeCount, setBeforeCount] = useState<number>(2);
     const [afterCount, setAfterCount] = useState<number>(2);
 
-    const canRetranslate = hasTranslation && selectedRowIndex !== -1 && beforeCount >= 0 && afterCount >= 0;
-
-    console.log("Footer retranslate state:", { hasTranslation, selectedRowIndex, beforeCount, afterCount, canRetranslate });
+    const canRetranslate = hasTranslation &&
+        selectedRowIndex !== undefined &&
+        selectedRowIndex !== -1 &&
+        (beforeCount > 0 || afterCount > 0);
 
     return (
         <Grid container spacing={2} alignItems="center">
-            {/* First Row */}
             <Grid size={{ xs: 12 }}>
                 <Box display="flex" alignItems="center" justifyContent="space-between" gap={3}>
                     <Box display="flex" gap={2} alignItems="center">
@@ -133,28 +129,41 @@ export const Footer: React.FC<Props> = ({
                         />
                     </Box>
 
-                    <FormControl sx={{ flexGrow: 4, opacity: isTranslating ? 0.5 : 1 }} disabled={isTranslating}>
-                        <InputLabel id="select-models-label">Select Model</InputLabel>
-                        <Select
-                            labelId="select-models-label"
-                            id="select-models"
-                            value={selectedModel?.modelId || ""}
-                            onChange={(e) => {
-                                const selected = models.find((m) => m.modelId === e.target.value);
-                                if (selected) setSelectedModel(selected);
-                            }}
-                            disabled={isTranslating}
-                        >
-                            <MenuItem value="" disabled>
-                                Select Model
-                            </MenuItem>
-                            {models.map((model) => (
-                                <MenuItem key={model.modelId} value={model.modelId}>
-                                    {model.modelId}
-                                </MenuItem>
-                            ))}
-                        </Select>
-                    </FormControl>
+                    <Autocomplete
+                        sx={{ flexGrow: 4, opacity: isTranslating ? 0.5 : 1 }}
+                        options={models}
+                        getOptionLabel={(option) => option.modelId}
+                        value={selectedModel}
+                        disabled={isTranslating}
+                        onChange={(event, value) => {
+                            if (value) {
+                                setSelectedModel(value);
+                            }
+                        }}
+                        renderOption={(props, option) => (
+                            <li {...props} key={option.modelId}>
+                                <Box sx={{ display: 'flex', justifyContent: 'space-between', width: '100%', gap: 2 }}>
+                                    <Typography sx={{ flexGrow: 1 }}>{option.modelId}</Typography>
+                                    {option.price &&
+                                    option.price.prompt !== -1 &&
+                                    option.price.completion !== -1 &&
+                                    option.price.request !== -1 ? (
+                                        <Box sx={{ display: 'flex', gap: 1, fontSize: '0.875rem', color: 'text.secondary' }}>
+                                            <Typography variant="caption">P: ${option.price.prompt?.toFixed(6) || '0'}</Typography>
+                                            <Typography variant="caption">C: ${option.price.completion?.toFixed(6) || '0'}</Typography>
+                                        </Box>
+                                    ) : (
+                                        <Typography variant="caption" sx={{ color: 'text.secondary', fontStyle: 'italic' }}>
+                                            Pricing N/A
+                                        </Typography>
+                                    )}
+                                </Box>
+                            </li>
+                        )}
+                        renderInput={(params) => (
+                            <TextField {...params} label="Select Model" placeholder="Search models..." />
+                        )}
+                    />
 
                     <Autocomplete
                         sx={{ flexGrow: 2, opacity: isTranslating ? 0.5 : 1 }}
@@ -194,7 +203,6 @@ export const Footer: React.FC<Props> = ({
                 </Box>
             </Grid>
 
-            {/* Second Row - Retranslate Section (only shown when translation exists) */}
             {hasTranslation && (
                 <Grid size={{ xs: 12 }}>
                     <Box display="flex" alignItems="center" gap={2} sx={{
@@ -233,7 +241,7 @@ export const Footer: React.FC<Props> = ({
                         <Typography variant="body2" color="text.secondary" sx={{ flexGrow: 1 }}>
                             {selectedRowIndex === -1
                                 ? "Select a row to retranslate"
-                                : `Will retranslate row ${selectedRowIndex + 1} with ${beforeCount} before and ${afterCount} after`}
+                                : `Retranslate row ${selectedRowIndex + 1} with ${beforeCount} before and ${afterCount} after`}
                         </Typography>
 
                         <Button
